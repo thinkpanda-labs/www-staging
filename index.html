@@ -1353,6 +1353,7 @@ p{margin:0}
     <div class="contact-grid">
       <form class="form" id="pitchForm" novalidate aria-labelledby="formTitle">
         <h3 id="formTitle">Pitch us your build</h3>
+        <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
         <div class="field"><label for="f-name">Name</label><input id="f-name" name="name" autocomplete="name" required aria-describedby="e-name"><span class="err" id="e-name"></span></div>
         <div class="field"><label for="f-email">Email</label><input id="f-email" name="email" type="email" autocomplete="email" required aria-describedby="e-email"><span class="err" id="e-email"></span></div>
         <div class="field"><label for="f-company">Company <span class="opt">(optional)</span></label><input id="f-company" name="company" autocomplete="organization"></div>
@@ -1572,7 +1573,8 @@ p{margin:0}
     syncCycle();
   }
 
-  /* contact form (not connected in this preview) */
+  /* contact form: posts to Google Apps Script web app */
+  var APPS_SCRIPT_URL='https://script.google.com/macros/s/AKfycbwVKuqYgBf7CaYci06ahtIJB5QeuMVpiM1cCRcERmv3FzB6b-FgGFAWtW4r3ZGVyx49/exec';
   var form=document.getElementById('pitchForm'),status=document.getElementById('formStatus');
   var rules=[['f-name','e-name','Enter your name.'],['f-email','e-email','Enter a valid email address, for example name@company.com.'],['f-msg','e-msg','Tell us briefly what you are building.']];
   form.addEventListener('submit',function(e){
@@ -1584,8 +1586,21 @@ p{margin:0}
       if(bad&&!first)first=el;
     });
     if(first){status.hidden=true;first.focus();return;}
-    status.hidden=false;
-    status.textContent='Thank you. This preview form is not connected yet, so nothing was sent.';
+    var btn=form.querySelector('button[type=submit]');
+    var payload={};
+    new FormData(form).forEach(function(v,k){payload[k]=String(v);});
+    btn.disabled=true;status.hidden=false;status.textContent='Sending...';
+    fetch(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)})
+      .then(function(r){return r.json();})
+      .then(function(j){
+        if(!j||!j.ok)throw new Error((j&&j.error)||'failed');
+        status.textContent='Thank you. We received your pitch and sent a confirmation to your email. We reply within 1-2 business days.';
+        form.reset();
+      })
+      .catch(function(){
+        status.textContent='Sorry, that did not go through. Please try again or email us directly.';
+      })
+      .then(function(){btn.disabled=false;});
   });
 })();
 
