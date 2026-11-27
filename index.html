@@ -729,11 +729,10 @@ p{margin:0}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .sig-img{filter:invert(1)}}
 :root[data-theme="dark"] .sig-img{filter:invert(1)}
 
-/* Example product tabs: full width, 3 per row on all screens */
-.xv-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%;max-width:100%}
-.xv-tab{border-right:1px solid var(--rule-strong);border-bottom:1px solid var(--rule-strong)}
-.xv-tab:nth-child(3n){border-right:0}
-.xv-tab:nth-last-child(-n+3){border-bottom:0}
+/* Example product tabs: every tab fully bordered, 3 per row on wide screens, 2 per row on narrow, labels on one line */
+.xv-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;width:100%;max-width:100%;border:0;padding:0 1px 1px 0;margin-bottom:var(--s-5)}
+.xv-tabs .xv-tab{border:1px solid var(--rule-strong);margin:0 -1px -1px 0;box-sizing:border-box;white-space:nowrap;justify-content:center;min-width:0}
+@media (max-width:720px){.xv-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}.xv-tabs .xv-tab{padding:.75rem .5rem}}
 </style>
 </head>
 <body>
